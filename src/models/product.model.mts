@@ -8,8 +8,13 @@ async function getAllProducts(): Promise<Product[] | null> {
     return data ;
 }
 
+async function getProductById(id: string): Promise<Product | null> {
+    const product = await mongodb.getDb().collection<Product>("products").findOne({id: id});
+    return product;
+}
 
 export default {
+    getProductById,
     getAllProducts
 };
 
