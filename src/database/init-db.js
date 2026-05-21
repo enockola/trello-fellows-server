@@ -1,6 +1,7 @@
 // import MongoClient and ServerApiVersion from the mongodb library and import products from the products.js file.
 import { MongoClient, ServerApiVersion } from "mongodb";
 import { products } from "./products.js";
+import * as argon2 from "argon2";
 
 //build the uri for our connection string
 // const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_URI}`;
@@ -21,6 +22,18 @@ const init = async () => {
     console.log(`Connected to MongoDB`);
     // get a reference to the actual database we will be using with .db(<database name>)
     const db = client.db(process.env.MONGO_DATABASE);
+
+    // Drop collection
+    await db.collection('alerts').drop();
+    await db.collection('orders').drop();
+
+    // Recreate collections
+    await db.createCollection('alerts');
+    await db.createCollection('orders');
+
+    // Initialize seedUser
+     await seedUsers(db);
+
 
     // initialize the Products collection
     await seedProducts(db);
@@ -85,5 +98,31 @@ const seedProducts = async (db) => {
     console.error(error.message);
   }
 };
+
+const seedUsers = async (db) => {
+  //drop and recreate the users collection
+  await db.collection("users").drop();
+  await db.createCollection("users");
+  // add indexes on email and name fields
+  await db.collection("users").createIndex({ email: 1 });
+  await db.collection("users").createIndex({ name: 1 });
+
+  // add a new user to the database
+  const user = {
+    email: "test@test.com",
+    password: await argon2.hash("password"),
+    name: "Test User",
+    createdAt: new Date(),
+    modifiedAt: new Date()
+  };
+  try {
+    // insert the user
+    const result = await db.collection("users").insertOne(user);
+    console.log(`New user created with the following id: ${result.insertedId}`);
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
 
 init();
