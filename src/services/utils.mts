@@ -1,4 +1,5 @@
 import type { QueryParams } from "../models/types.mts";
+import jsonwebtoken from "jsonwebtoken";
 
 export function formatFields(fields:string) {
     const fieldsArr = fields?.split(",");
@@ -61,3 +62,12 @@ export function sanitize(v:Record<string, any>) {
     }
     return v;
 };
+
+export function generateToken(user: string) {
+  const secret = process.env.JWT_SECRET || "secret";
+  const expires = process.env.JWT_EXPIRES_IN || "10m" as any;
+
+  const jwtUser={email: user.email, id: user._id}
+  const token = jsonwebtoken.sign(jwtUser, secret, { expiresIn: expires });
+  return token;
+}
