@@ -63,11 +63,11 @@ export function sanitize(v:Record<string, any>) {
     return v;
 };
 
-export function generateToken(user: string) {
+export function generateToken(user: any) {
   const secret = process.env.JWT_SECRET || "secret";
-  const expires = process.env.JWT_EXPIRES_IN || "10m" as any;
+  const expires = (process.env.JWT_EXPIRES_IN || "10m") as any;
 
-  const jwtUser={email: user.email, id: user._id}
+  const jwtUser = { email: user.email, _id: user._id };
   const token = jsonwebtoken.sign(jwtUser, secret, { expiresIn: expires });
   return token;
 }
