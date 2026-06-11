@@ -1,13 +1,28 @@
-import mongodb from '../database/index.mts';
-import type { User } from './types.mts';
+import { Collection } from "mongodb";
+import { getDb } from "../database/index.mts";
 
-export async function getUserByEmail(email: string): Promise<User | null> {
-    try {
-        const db = mongodb.getDb();
-        const user = await db.collection<User>('users').findOne({ email: email });
-        return user;
-    } catch (error) {
-        console.error('Error fetching user by email:', error);
-        throw new Error('Database query error occured while fetching user by email');
-    }
+export interface User {
+  _id?: string;
+  email: string;
+  password?: string;
+  name: string;
+  createdAt: Date;
+  modifiedAt: Date;
 }
+
+async function getCollection(): Promise<Collection<User>> {
+  const db = await getDb();
+  return db.collection<User>("users");
+}
+
+export const userModel = {
+  async getUserByEmail(email: string): Promise<User | null> {
+    const collection = await getCollection();
+    return await collection.findOne({ email: email });
+  },
+
+  async createUser(user: User): Promise<any> {
+    const collection = await getCollection();
+    return await collection.insertOne(user);
+  }
+};
