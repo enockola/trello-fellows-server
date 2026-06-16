@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import path from "path";
 import { fileURLToPath } from "url";
@@ -30,6 +31,8 @@ app.use(helmet());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+app.use(cors());
 
 // Rate Limiting (Prevent Brute Force & DOS attacks)
 // Limits requests from the same IP

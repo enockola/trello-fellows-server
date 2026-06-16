@@ -7,7 +7,9 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
+  // If we can't connect within 5 seconds, fail immediately.
+  serverSelectionTimeoutMS: 5000, 
 });
 
 let _db: MongoClient | null = null;
@@ -31,7 +33,7 @@ const initDb = async (callback:Function) => {
   }
 };
 
-const getDb = () => {
+export const getDb = () => {
   if (!_db) {
     throw Error('Db not initialized');
   }

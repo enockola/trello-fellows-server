@@ -1,5 +1,10 @@
+
+import "dotenv/config";
+
 import mongodb from "./database/index.mts";
 import app from "./app.ts";
+
+console.log("=== BOOTING UP SERVER ===");
 
 const port = process.env.PORT || 3000;
 
